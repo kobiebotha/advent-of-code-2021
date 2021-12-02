@@ -1,47 +1,24 @@
 "use strict";
-const fs = require('fs');
-function readInputs() {
-    let depths = [];
-    try {
-        const data = fs.readFileSync('./inputs/day1', 'utf8');
-        depths = data.split('\n').map((x) => parseInt(x));
-    }
-    catch (err) {
-        console.error(err);
-    }
-    return depths;
-}
-function day1() {
-    const depths = readInputs();
-    let depthIncreaseCounter = 0;
-    for (let i = 1; i < depths.length; i++) {
-        if (depths[i] > depths[i - 1]) {
-            depthIncreaseCounter++;
-        }
-    }
-    console.log('Number of times that depth increased = ', depthIncreaseCounter.toString());
-}
-/**
- *
- * @param depths array of depth measurements
- * @param index the _end_ index from which to calculate the sliding window
- */
-function calcWindow(depths, index, windowWidth) {
-    return depths[index - windowWidth + 1] + depths[index - windowWidth + 2] + depths[index - windowWidth + 3];
-}
-function day1part2() {
-    const depths = readInputs();
-    // const depths: number[] = [199, 200,208,210,200,207,240,269,260,263]
-    const slidingWindowLength = 3;
-    let depthIncreaseCounter = 0;
-    for (let i = slidingWindowLength; i < depths.length; i++) {
-        let thisResult = calcWindow(depths, i, slidingWindowLength);
-        let prevResult = calcWindow(depths, i - 1, slidingWindowLength);
-        if (thisResult > prevResult) {
-            depthIncreaseCounter++;
-        }
-    }
-    console.log('number of changes = ', depthIncreaseCounter);
-}
-day1part2();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const day2 = __importStar(require("./days/day2"));
+day2.run();
 //# sourceMappingURL=app.js.map

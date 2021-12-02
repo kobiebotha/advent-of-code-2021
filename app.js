@@ -14,15 +14,34 @@ function readInputs() {
 function day1() {
     const depths = readInputs();
     let depthIncreaseCounter = 0;
-    let loopCounter = 0;
     for (let i = 1; i < depths.length; i++) {
         if (depths[i] > depths[i - 1]) {
             depthIncreaseCounter++;
         }
-        loopCounter = i;
     }
     console.log('Number of times that depth increased = ', depthIncreaseCounter.toString());
-    console.log('done');
 }
-day1();
+/**
+ *
+ * @param depths array of depth measurements
+ * @param index the _end_ index from which to calculate the sliding window
+ */
+function calcWindow(depths, index, windowWidth) {
+    return depths[index - windowWidth + 1] + depths[index - windowWidth + 2] + depths[index - windowWidth + 3];
+}
+function day1part2() {
+    const depths = readInputs();
+    // const depths: number[] = [199, 200,208,210,200,207,240,269,260,263]
+    const slidingWindowLength = 3;
+    let depthIncreaseCounter = 0;
+    for (let i = slidingWindowLength; i < depths.length; i++) {
+        let thisResult = calcWindow(depths, i, slidingWindowLength);
+        let prevResult = calcWindow(depths, i - 1, slidingWindowLength);
+        if (thisResult > prevResult) {
+            depthIncreaseCounter++;
+        }
+    }
+    console.log('number of changes = ', depthIncreaseCounter);
+}
+day1part2();
 //# sourceMappingURL=app.js.map

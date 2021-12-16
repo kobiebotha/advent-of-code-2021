@@ -20,12 +20,27 @@ class Point {
     }
 }
 
+enum LineType {
+    Straight,
+    Diagonal,
+    NotSet
+}
+
+enum DiagLineType {
+    UpRight,
+    UpLeft,
+    DownRight,
+    DownLeft,
+    Error
+}
 class Line {
     private _start: Point;
     private _end: Point;
-    constructor(start: Point, end: Point) {
+    private _type: LineType
+    constructor(start: Point, end: Point, lineType: LineType) {
         this._start = start;
         this._end = end;
+        this._type = lineType;
     }
 
     get startX() {
@@ -44,6 +59,13 @@ class Line {
         return this._end.y;
     }
 
+    get lineType() {
+        return this._type;
+    }
+
+    set lineType(newType: LineType) {
+        this._type = newType;
+    }
 }
 
 const parseLine = (input: string): Line => {
@@ -51,13 +73,23 @@ const parseLine = (input: string): Line => {
     const results = input.match(re) || '';
     const point1 = new Point(parseInt(results[1]), parseInt(results[2]));
     const point2 = new Point(parseInt(results[3]), parseInt(results[4]));
-    const line = new Line(point1, point2);
+    const line = new Line(point1, point2, LineType.NotSet);
     return line;
 }
 
 const filterLines = (inLines: Line[]): Line[] => {
+    let deltaX, deltaY = 0;
     let result = inLines.filter(element => {
+        deltaX = Math.abs(element.endX - element.startX);
+        deltaY = Math.abs(element.endY - element.startY);
+
+        if (deltaX == deltaY) {
+            element.lineType = LineType.Diagonal;
+            return element;
+        }
+
         if ((element.startX == element.endX) || (element.startY == element.endY)) {
+            element.lineType = LineType.Straight;
             return element;
         }
     })
@@ -105,7 +137,7 @@ const getGridSize = (lines: Line[]): [number, number] => {
         }
     })
 
-    return [maxX+1, maxY+1];
+    return [maxX + 1, maxY + 1];
 }
 
 const absLine = (line: Line): Line => {
@@ -114,17 +146,48 @@ const absLine = (line: Line): Line => {
     let endX = line.endX;
     let endY = line.endY;
 
-    if (line.startX > line.endX) {
-        startX = line.endX;
-        endX = line.startX;
+    if (line.lineType == LineType.Straight) {
+        if (line.startX > line.endX) {
+            startX = line.endX;
+            endX = line.startX;
+        }
+
+        if (line.startY > line.endY) {
+            startY = line.endY;
+            endY = line.startY;
+        }
+    }
+    //don't "fix" diagonal lines, there are 4 types and they are processed separately in processGrid
+
+    let newLine = new Line(new Point(startX, startY), new Point(endX, endY), line.lineType);
+
+    return newLine;
+}
+
+const getDiagType = (line: Line): DiagLineType => {
+    if (line.lineType != LineType.Diagonal) {
+        throw new Error("Can't run this function on a non-diagonal");
     }
 
-    if (line.startY > line.endY) {
-        startY = line.endY;
-        endY = line.startY;
+    if (line.startX < line.endX) {
+        if (line.startY < line.endY) {
+            return DiagLineType.DownRight
+        }
+        else if (line.startY > line.endY) {
+            return DiagLineType.UpRight;
+        }
     }
 
-    return new Line(new Point(startX, startY), new Point(endX, endY));
+    else if (line.startX > line.endX) {
+        if (line.startY > line.endY) {
+            return DiagLineType.UpLeft;
+        }
+        else if (line.startY < line.endY) {
+            return DiagLineType.DownLeft;
+        }
+    }
+
+    return DiagLineType.Error
 }
 
 const processGrid = (lines: Line[], grid: number[][]): number[][] => {
@@ -133,9 +196,47 @@ const processGrid = (lines: Line[], grid: number[][]): number[][] => {
     });
 
     absLines.forEach((line) => {
-        for (let i = line.startX; i <= line.endX; i++) {
-            for (let j = line.startY; j <= line.endY; j++) {
-                grid[j][i]++;
+
+        if (line.lineType == LineType.Straight) {
+            for (let i = line.startX; i <= line.endX; i++) {
+                for (let j = line.startY; j <= line.endY; j++) {
+                    grid[j][i]++;
+                }
+            }
+        }
+        else if (line.lineType == LineType.Diagonal) {
+            let linePos = 0;
+            switch (getDiagType(line)) {
+                case DiagLineType.DownLeft:
+                    linePos = 0;
+                    for (let row = line.startY; row <= line.endY; row++) {
+                        grid[row][line.startX - linePos]++;
+                        linePos++;
+                    }
+                    break;
+                case DiagLineType.UpLeft:
+                    linePos = 0;
+                    for (let row = line.startY; row >= line.endY; row--) {
+                        grid[row][line.startX - linePos]++;
+                        linePos++;
+                    }
+                    break;
+                case DiagLineType.DownRight:
+                    linePos = 0;
+                    for (let row = line.startY; row <= line.endY; row++) {
+                        grid[row][line.startX + linePos]++;
+                        linePos++;
+                    }
+                    break;
+                case DiagLineType.UpRight:
+                    linePos = 0;
+                    for (let row = line.startY; row >= line.endY; row--) {
+                        grid[row][line.startX + linePos]++;
+                        linePos++;
+                    }
+                    break;
+                default:
+                    throw new Error("There was an issue");
             }
         }
     })
@@ -147,7 +248,7 @@ const countOverlap = (grid: number[][]): number => {
     let sum = 0;
 
     for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[i].length; j++ ) {
+        for (let j = 0; j < grid[i].length; j++) {
             if (grid[i][j] > 1) {
                 sum++;
             }
@@ -172,5 +273,5 @@ export function run() {
 
     const sum = countOverlap(processedGrid);
 
-    console.log('it ran')
+    console.log('it ran, sum = ' + sum);
 }

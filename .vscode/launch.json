@@ -6,11 +6,12 @@
     "configurations": [
       {
         "type": "node",
+        "runtimeVersion": "16.13.1",
         "request": "launch",
         "name": "Launch Program",
         "program": "${workspaceFolder}/app.ts",
         "preLaunchTask": "tsc: build - tsconfig.json",
-        "postDebugTask": "clean",
+        // "postDebugTask": "clean",
         "outFiles": ["${workspaceFolder}/**/*.js"]
       }
     ]

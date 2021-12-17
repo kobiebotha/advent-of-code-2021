@@ -2,7 +2,6 @@ import { forEach, map } from "lodash";
 
 const fs = require('fs')
 
-
 class Point {
     private _x: number;
     private _y: number;

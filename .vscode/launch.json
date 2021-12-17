@@ -11,8 +11,8 @@
         "name": "Launch Program",
         "program": "${workspaceFolder}/app.ts",
         "preLaunchTask": "tsc: build - tsconfig.json",
-        // "postDebugTask": "clean",
-        "outFiles": ["${workspaceFolder}/**/*.js"]
+        "postDebugTask": "clean",
+        "outFiles": ["${workspaceFolder}/**/*.js"],
       }
     ]
   }

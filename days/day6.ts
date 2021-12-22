@@ -1,5 +1,43 @@
 const fs = require('fs')
 
+class School {
+    public newBornFish: number[] = [0,0,0,0,0,0,0,0,0]
+    public oldTimers: number[] = [0,0,0,0,0,0,0]
+
+    constructor(fishies: Fish[]) {
+        fishies.forEach((fish) => {
+            this.oldTimers[fish.getAge]++;
+        })
+    }
+
+    tick() {
+        let newBorns = this.newBornFish[0]; //these were one year olds from previous tick, and will create newborns at the end of this tick
+        let otnewBorns = this.oldTimers[0];
+
+        //process newborns. shift all left by 1
+        for (let i = 0; i < this.newBornFish.length-1; i++) {
+            this.newBornFish[i] = this.newBornFish[i+1];
+        }
+        
+        //process old timers
+        for (let i = 0; i < this.oldTimers.length-1; i++) {
+            this.oldTimers[i] = this.oldTimers[i+1];
+        }
+        
+        //each zero from newborn must add to eights from newborns AND
+        //each zero from old timers must add to eights from newborns
+        this.newBornFish[8]= (newBorns + otnewBorns); 
+
+        //zeros from newborn must add to 6 from old timers AND
+        //zeros from old timers add to 6 from old timers
+        this.oldTimers[6]= (newBorns + otnewBorns);
+    }
+
+    getFishCount(): number {
+        return (this.newBornFish.reduce((a, b) => a + b, 0) + this.oldTimers.reduce((a, b) => a + b, 0));
+    }
+}
+
 class Fish {
     constructor(private age: number, private newborn: boolean) {
 
@@ -44,16 +82,15 @@ const readFish = (debug: boolean): Fish[] => {
 }
 
 export function run() {
-    let debug = true;
-    let numdays = 256;
+    let debug = false;
+    let numdays =256;
 
     let fish = readFish(debug);
+    let school = new School(fish);
 
     for (let i = 0; i < numdays; i++) {
-        fish.forEach((thisFish) => {
-            thisFish.tick(fish);
-        })
+        school.tick();
     }
 
-    console.log('it ran. Total number of fish = ', fish.length);
+    console.log('it ran. Total number of fish = ', school.getFishCount());
 }

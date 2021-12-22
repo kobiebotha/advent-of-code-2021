@@ -4,15 +4,18 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-      {
-        "type": "node",
-        "runtimeVersion": "16.13.1",
-        "request": "launch",
-        "name": "Launch Program",
-        "program": "${workspaceFolder}/app.ts",
-        "preLaunchTask": "tsc: build - tsconfig.json",
-        "postDebugTask": "clean",
-        "outFiles": ["${workspaceFolder}/**/*.js"],
-      }
+        {
+            "type": "node",
+            "runtimeVersion": "16.13.1",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/app.ts",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ]
+        }
     ]
-  }
+}

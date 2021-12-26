@@ -167,23 +167,14 @@ function tokenIntersection(seq0: string, seq1: string): string {
     return char;
 }
 
-function sequencesEqual(seq0: string, seq1: string, lengthValidation?: boolean): boolean {
-    if (lengthValidation && (seq0.length != seq1.length)) {
-        throw new Error("Can't use sequencesEqual function this way");
+function sequencesEqual(seq0: string, seq1: string): boolean {
+    if (seq0.length != seq1.length) {
+        return false;
     }
 
-    if (lengthValidation) {
-        for (let i = 0; i < seq0.length; i++) {
-            if (!seq1.includes(seq0[i]) || !seq0.includes(seq1[i])) {
-                return false;
-            }
-        }
-    }
-    else {
-        for (let i = 0; i < seq0.length; i++) {
-            if (!seq1.includes(seq0[i])) {
-                return false;
-            }
+    for (let i = 0; i < seq0.length; i++) {
+        if (!seq1.includes(seq0[i]) || !seq0.includes(seq1[i])) {
+            return false;
         }
     }
 
@@ -197,34 +188,34 @@ function validateSegment(segment: string, length: number) {
 }
 
 function getDigitFromSequence(sequence: string): string {
-    if (sequencesEqual(sequence, ZERO, true)) {
+    if (sequencesEqual(sequence, ZERO)) {
         return '0';
     }
-    else if (sequencesEqual(sequence, ONE, true)) {
+    else if (sequencesEqual(sequence, ONE)) {
         return '1';
     }
-    else if (sequencesEqual(sequence, TWO, true)) {
+    else if (sequencesEqual(sequence, TWO)) {
         return '2';
     }
-    else if (sequencesEqual(sequence, THREE, true)) {
+    else if (sequencesEqual(sequence, THREE)) {
         return '3';
     }
-    else if (sequencesEqual(sequence, FOUR, true)) {
+    else if (sequencesEqual(sequence, FOUR)) {
         return '4';
     }
-    else if (sequencesEqual(sequence, FIVE, true)) {
+    else if (sequencesEqual(sequence, FIVE)) {
         return '5';
     }
-    else if (sequencesEqual(sequence, SIX, true)) {
+    else if (sequencesEqual(sequence, SIX)) {
         return '6';
     }
-    else if (sequencesEqual(sequence, SEVEN, true)) {
+    else if (sequencesEqual(sequence, SEVEN)) {
         return '7';
     }
-    else if (sequencesEqual(sequence, EIGHT, true)) {
+    else if (sequencesEqual(sequence, EIGHT)) {
         return '8';
     }
-    else if (sequencesEqual(sequence, NINE, true)) {
+    else if (sequencesEqual(sequence, NINE)) {
         return '9';
     }
 
@@ -233,10 +224,10 @@ function getDigitFromSequence(sequence: string): string {
 
 function getNumberFromSegments(desiredNumber: string): string {
     if (desiredNumber == 'six') {
-        return [displayMap[0], displayMap[1], displayMap[4], displayMap[6], displayMap[5], displayMap[3]].join()
+        return [displayMap[0], displayMap[1], displayMap[4], displayMap[6], displayMap[5], displayMap[3]].join('')
     }
     else if (desiredNumber == 'nine') {
-        return [displayMap[6], displayMap[5], displayMap[2], displayMap[0], displayMap[1], displayMap[3]].join();
+        return [displayMap[6], displayMap[5], displayMap[2], displayMap[0], displayMap[1], displayMap[3]].join('');
     }
 
     return "it broke";
@@ -340,7 +331,7 @@ function resetDisplayMap() {
 
 
 export function run() {
-    let debug = true;
+    let debug = false;
     let debugSums = [8394, 9781, 1197, 9361, 4873, 8418, 4548, 1625, 8717, 4315];
     let data = readData(debug);
 
@@ -358,7 +349,7 @@ export function run() {
         processSequence(allSignals[i]);
         let thisNumber: string[] = allNumbers[i].split(' ');
         let number = thisNumber.map((seq) => getDigitFromSequence(seq));
-        sum += parseInt(number.join());
+        sum += parseInt(number.join(''));
     }
 
     console.log('sum = ', sum);

@@ -1,3 +1,3 @@
-import * as day from './days/day9';
+import * as day from './days/day10';
 
 day.run();

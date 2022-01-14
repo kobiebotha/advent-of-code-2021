@@ -36,7 +36,8 @@ function parseString(thisStr: string): object {
     let callStack: string[] = []
     let result = {
         code: 'OK',
-        errorCharacter: ''
+        errorCharacter: '',
+        callStack: ['']
     }
 
     let tokenTracker = {
@@ -80,12 +81,12 @@ function parseString(thisStr: string): object {
                 const matching = closingMap[thisChar];
                 const topCall = callStack.slice(-1);
                 if (matching != topCall) {
-                    result = {code: 'ERROR_WRONG_CLOSE', errorCharacter: thisStr[i]};
+                    result = {code: 'ERROR_WRONG_CLOSE', errorCharacter: thisStr[i], callStack: callStack};
                     return result;
                 }
                 //@ts-ignore
                 if (tokenTracker[matching] == 0) {
-                    result = {code: 'ERROR_UNEXPECTED_CLOSE', errorCharacter: thisStr[i]};
+                    result = {code: 'ERROR_UNEXPECTED_CLOSE', errorCharacter: thisStr[i], callStack: callStack};
                     return result;
                 }
                 else {
@@ -96,12 +97,47 @@ function parseString(thisStr: string): object {
                 }
         }
     }
+    //@ts-ignore
+    result.callStack = callStack;
     return result;
 }
 
+function isIncomplete(result: object): boolean {
+    //@ts-ignore
+    if (result.callStack.length > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+function getScore(result: object): number {
+    //inverted to make scoring simpler based on contents of result.callStack
+    const scoreMap = {
+        '(': 1,
+        '[': 2,
+        '{': 3,
+        '<': 4
+    }
+    let score = 0;
+
+    //@ts-ignore
+    for (let i = result.callStack.length-1; i >=0; i-- ) {
+        score = score*5;
+        //@ts-ignore
+        score+= scoreMap[result.callStack[i]];
+    }
+
+    return score;
+}
+
+
 export function run() {
-    const test='{([(<{}[<>[]}>{[]{[(<()>';
-    let result = parseString(test);
+    let incompleteScores: number[] = [];
+    // const test='[({(<(())[]>[[{[]{<()<>>';
+    // const test = '<{([{{}}[<[[[<>{}]]]>[]]';
+    // let result = parseString(test);
+    // let thisScore = getScore(result);
 
 
     let strings = loadStrings(false);
@@ -109,12 +145,22 @@ export function run() {
 
     strings.forEach(element => {
         let result = parseString(element);
+
         //@ts-ignore
-        if (result.code != 'OK') {
-            //@ts-ignore
-            score += scoreMap[result.errorCharacter]; 
+        if (result.code == 'OK' && isIncomplete(result)) {
+            let score = getScore(result);
+            incompleteScores.push(score);
         }
+        //@ts-ignore
+        // if (result.code != 'OK') {
+        //     //@ts-ignore
+        //     score += scoreMap[result.errorCharacter]; 
+        // }
     });
+
+    let sortedScores = incompleteScores.sort(function(a,b) { return a-b;});
+
+    let middleElement = sortedScores[Math.floor(sortedScores.length/2)];
 
     console.log(`it ran, score = ${score}`);
 

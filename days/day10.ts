@@ -131,7 +131,6 @@ function getScore(result: object): number {
     return score;
 }
 
-
 export function run() {
     let incompleteScores: number[] = [];
     // const test='[({(<(())[]>[[{[]{<()<>>';

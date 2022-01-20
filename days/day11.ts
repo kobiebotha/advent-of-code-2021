@@ -39,7 +39,7 @@ function hasFlashed(matrix: [number, number][], cell: [number, number]): boolean
     return hasFlashed
 }
 
-function tic() {
+function tic():boolean {
     const mapHeight = energyMap.length;
     const mapWidth = energyMap[0].length;
 
@@ -78,6 +78,17 @@ function tic() {
             }
         }
     }
+
+    //check whether all have flashed
+    let allFlashed = true;
+    for (let row = 0; (row < mapHeight && allFlashed); row++) {
+        for (let col = 0; (col < mapWidth && allFlashed); col++) {
+            if (energyMap[row][col] != 0) {
+                allFlashed = false;
+            }
+        }
+    }
+    return allFlashed;
 }
 
 function flashPixel(row: number, col: number) {
@@ -155,8 +166,11 @@ export function run() {
     //     [1, 9, 9, 9, 1],
     //     [1, 1, 1, 1, 1]]
 
-    for (let i = 0; i < 100; i++) {
-        tic();
+    for (let i = 0; i < 200000; i++) {
+        let allFlashed = tic();
+        if (allFlashed) {
+            console.log('STOP');
+        }
     }
 
     console.log('done');

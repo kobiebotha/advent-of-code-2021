@@ -130,6 +130,7 @@ function isEndPath(path: string): boolean {
 function getStepDictionary(steps: string[]): any {
     let dict = {};
     steps.forEach(step => {
+        //TODO: this is broken
         if (Object.getOwnPropertyNames(dict).indexOf(step) > -1) { //key exists, increment it
             //@ts-ignore
             dict[step] = dict[step]+1;
@@ -139,40 +140,48 @@ function getStepDictionary(steps: string[]): any {
             dict[step] = 1;
         }
     });
+
+    return dict;
 }
 
 function isValidDict(dict: any): boolean {
-    let isValid: boolean = true;
-    let smallCaves: number = 0;
+    let isValid: boolean = false;
+    let smallCaveThreeTimes: boolean = false;
+    let smallCaves: number = 0; //the number of times a small cave appears more than once
 
     for (const prop in dict) {
-        if ((prop == prop.toLowerCase()) && (dict[prop] > 1)) {
+        if ((prop == prop.toLowerCase()) && (dict[prop] > 2)) { //no small nodes allowed more than twice, return false immediately
+            smallCaveThreeTimes = true;
+        }
+
+        else if ((prop == prop.toLowerCase()) && (dict[prop] > 1)) {
             smallCaves++;
         }
     }
 
-    if (smallCaves > 1) {
-        isValid = false;
+    if (!smallCaveThreeTimes && smallCaves <= 1) { //pretty nasty, probably need to rewrite this function
+        isValid = true;
     }
 
     return isValid;
 }
 
-function isValidPath(currentPath: string, newNode: string): boolean {
-    let isValid: boolean = true;
 
-    //make sure we only look at small nodes
+function isValidPath(currentPath: string, newNode: string): boolean {
+    let isValid: boolean = false;
+
+    //make sure we only look at small nodes as large nodes can be visited any number of times
     if (newNode == newNode.toLowerCase()) {
         let steps = currentPath.split(',');
+        steps.push(newNode);
         //create a dictionary of steps and their counts
         let dict = getStepDictionary(steps);
-        if (!isValidDict(dict))  {
-            isValid = false;
+        if (isValidDict(dict))  {
+            isValid = true;
         }
-
-        if (steps.indexOf(newNode) > -1) {
-            isValid = false;
-        }
+    }
+    else { //always allow uppercase nodes
+        isValid = true;
     }
 
     return isValid;
